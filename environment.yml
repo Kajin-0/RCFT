@@ -1,0 +1,9 @@
+name: rcft-ai-bootstrap
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - pytest
+  - ruff
+  - sympy
+  - sage
