@@ -11,6 +11,9 @@ requires-python = ">=3.10"
 authors = [{ name = "Terence Fisher" }]
 dependencies = []
 
+[project.scripts]
+rcft-validate = "rcft.cli:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
