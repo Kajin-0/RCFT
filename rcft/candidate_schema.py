@@ -3,10 +3,54 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import StrEnum
 from fractions import Fraction
 from typing import Any
 
 from rcft.exact import parse_fraction, parse_fraction_list
+
+
+class CertificateStage(StrEnum):
+    """Staged certification ladder for RCFT candidate records.
+
+    The stage names deliberately distinguish admissible q-series from realized RCFTs.
+    """
+
+    GENERATED = "generated"
+    SCHEMA_VALID = "schema_valid"
+    ADMISSIBLE_Q_SERIES = "admissible_q_series"
+    MODULAR_DATA_RECOVERED = "modular_data_recovered"
+    VERLINDE_PASSING = "verlinde_passing"
+    TENABLE = "tenable"
+    MATCHED_KNOWN = "matched_known"
+    UNRESOLVED_CANDIDATE = "unresolved_candidate"
+    REJECTED = "rejected"
+
+
+@dataclass(frozen=True)
+class GeneratorProvenance:
+    """Information about how a candidate was generated."""
+
+    method: str = "unknown"
+    reference_key: str | None = None
+    parameters: dict[str, Any] = field(default_factory=dict)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> "GeneratorProvenance":
+        if data is None:
+            return cls()
+        return cls(
+            method=str(data.get("method", "unknown")),
+            reference_key=None if data.get("reference_key") is None else str(data["reference_key"]),
+            parameters=dict(data.get("parameters", {})),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "method": self.method,
+            "reference_key": self.reference_key,
+            "parameters": self.parameters,
+        }
 
 
 @dataclass(frozen=True)
@@ -59,6 +103,9 @@ class Candidate:
     characters: tuple[Character, ...]
     q_precision: int
     wronskian_index: int | None = None
+    certificate_stage: CertificateStage = CertificateStage.GENERATED
+    subgroup: str = "SL2Z"
+    provenance: GeneratorProvenance = field(default_factory=GeneratorProvenance)
     metadata: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
@@ -76,6 +123,9 @@ class Candidate:
             wronskian_index=(
                 None if data.get("wronskian_index") is None else int(data["wronskian_index"])
             ),
+            certificate_stage=CertificateStage(data.get("certificate_stage", CertificateStage.GENERATED)),
+            subgroup=str(data.get("subgroup", "SL2Z")),
+            provenance=GeneratorProvenance.from_dict(data.get("provenance")),
             metadata=dict(data.get("metadata", {})),
         )
 
@@ -87,6 +137,9 @@ class Candidate:
             "central_charge": str(self.central_charge),
             "wronskian_index": self.wronskian_index,
             "q_precision": self.q_precision,
+            "certificate_stage": self.certificate_stage.value,
+            "subgroup": self.subgroup,
+            "provenance": self.provenance.to_dict(),
             "characters": [character.to_dict() for character in self.characters],
             "metadata": self.metadata,
         }
