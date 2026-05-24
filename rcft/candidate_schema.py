@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import StrEnum
+from enum import Enum
 from fractions import Fraction
 from typing import Any
 
 from rcft.exact import parse_fraction, parse_fraction_list
 
 
-class CertificateStage(StrEnum):
+class CertificateStage(str, Enum):
     """Staged certification ladder for RCFT candidate records.
 
     The stage names deliberately distinguish admissible q-series from realized RCFTs.
@@ -123,7 +123,7 @@ class Candidate:
             wronskian_index=(
                 None if data.get("wronskian_index") is None else int(data["wronskian_index"])
             ),
-            certificate_stage=CertificateStage(data.get("certificate_stage", CertificateStage.GENERATED)),
+            certificate_stage=CertificateStage(data.get("certificate_stage", CertificateStage.GENERATED.value)),
             subgroup=str(data.get("subgroup", "SL2Z")),
             provenance=GeneratorProvenance.from_dict(data.get("provenance")),
             metadata=dict(data.get("metadata", {})),
