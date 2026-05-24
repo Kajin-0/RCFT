@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rcft-ai-bootstrap"
+version = "0.1.0"
+description = "Exact-arithmetic modular-bootstrap tooling for rational conformal field theory candidate discovery."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "Terence Fisher" }]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.5",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
